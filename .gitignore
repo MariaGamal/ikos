@@ -36,3 +36,7 @@ __pycache__
 # IKOS
 *.ar
 *.db
+
+# Mine
+.rebuild.sh
+ikos-tests
