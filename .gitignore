@@ -38,5 +38,5 @@ __pycache__
 *.db
 
 # Mine
-.rebuild.sh
+rebuild.sh
 ikos-tests
