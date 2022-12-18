@@ -335,6 +335,11 @@ def parse_arguments(argv):
 
     # Debug options
     debug = parser.add_argument_group('Debug Options')
+    debug.add_argument('--display-dependency',
+                       dest='display_dependency',
+                       help='Display the Dependency between iterations',
+                       action='store_true',
+                       default=False)
     debug.add_argument('--display-llvm',
                        dest='display_llvm',
                        help='Display the LLVM bitcode as text',
@@ -955,6 +960,7 @@ def ikos_view(opt, db):
 #################
 
 def main(argv):
+    # print(argv) # ['/home/mariag/ikos/build/bin/ikos', '-v', '--display-ar', 'ikos-tests/loop.c']
     progname = os.path.basename(argv[0])
 
     start_date = datetime.datetime.now()
@@ -1026,6 +1032,9 @@ def main(argv):
     except AnalyzerError as e:
         printf('%s: error: %s\n', progname, e, file=sys.stderr)
         sys.exit(e.returncode)
+
+    if opt.display_dependency:
+        print("****************** DISPLAU CUSTOM DEPENDENCY ANALYSIS ******************")
 
     # open output database
     db = OutputDatabase(path=opt.output_db)
