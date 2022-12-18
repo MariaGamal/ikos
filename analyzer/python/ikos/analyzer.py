@@ -865,6 +865,9 @@ def ikos_analyzer(db_path, pp_path, opt):
         cmd.append('-display-fixpoint-parameters')
     if opt.generate_dot:
         cmd += ['-generate-dot', '-generate-dot-dir', opt.generate_dot_dir]
+    if opt.display_dependency:
+        print("****************** DISPLAU CUSTOM DEPENDENCY ANALYSIS ******************")
+        cmd.append('-display-dependency')
 
     # add -name-values if necessary
     if (opt.display_checks in ('all', 'fail') or
@@ -1032,9 +1035,6 @@ def main(argv):
     except AnalyzerError as e:
         printf('%s: error: %s\n', progname, e, file=sys.stderr)
         sys.exit(e.returncode)
-
-    if opt.display_dependency:
-        print("****************** DISPLAU CUSTOM DEPENDENCY ANALYSIS ******************")
 
     # open output database
     db = OutputDatabase(path=opt.output_db)

@@ -865,6 +865,11 @@ static void generate_dot(ar::Bundle* bundle,
 
 /// \brief Main for ikos-analyzer
 int main(int argc, char** argv) {
+  analyzer::log::info("My analysis");
+  analyzer::log::info("argc " + std::to_string(argc));
+  for (int i = 0; i < argc; i++) {
+    analyzer::log::info(std::to_string(i) + " " + argv[i]);
+  }
   llvm::InitLLVM x(argc, argv);
 
   // Program name
