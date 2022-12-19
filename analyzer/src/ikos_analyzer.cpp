@@ -581,6 +581,11 @@ static llvm::cl::opt< bool > DisplayAR(
     llvm::cl::desc("Display the Abstract Representation as text"),
     llvm::cl::cat(DebugCategory));
 
+static llvm::cl::opt< bool > DisplayDependency(
+    "display-dependency",
+    llvm::cl::desc("Display the Dependency between iterations"),
+    llvm::cl::cat(DebugCategory));
+
 static llvm::cl::opt< bool > TraceARStmts(
     "trace-ar-stmts",
     llvm::cl::desc("Trace Abstract Representation statements during analysis"),
@@ -865,11 +870,11 @@ static void generate_dot(ar::Bundle* bundle,
 
 /// \brief Main for ikos-analyzer
 int main(int argc, char** argv) {
-  analyzer::log::info("My analysis");
-  analyzer::log::info("argc " + std::to_string(argc));
-  for (int i = 0; i < argc; i++) {
-    analyzer::log::info(std::to_string(i) + " " + argv[i]);
-  }
+  // analyzer::log::info("My analysis");
+  // analyzer::log::info("argc " + std::to_string(argc));
+  // for (int i = 0; i < argc; i++) {
+  //   analyzer::log::info(std::to_string(i) + " " + argv[i]);
+  // }
   llvm::InitLLVM x(argc, argv);
 
   // Program name
