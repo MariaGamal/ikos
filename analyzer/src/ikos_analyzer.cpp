@@ -1023,6 +1023,17 @@ int main(int argc, char** argv) {
       ar::TextFormatter formatter(make_format_options());
       formatter.format(analyzer::log::msg().stream(), bundle);
     }
+    
+    if (DisplayDependency)
+    {
+      analyzer::log::info("**************** DISPLAY CUSTOM DEPENDENCY ANALYSIS ****************");
+      analyzer::ScopeTimerDatabase t(output_db.times,
+                                     "ikos-analyzer.display-dependency");
+      // Save the output of DisplayAR
+      
+      // ar::DependencyGraph dg(bundle);
+      // dg.print(analyzer::log::msg().stream());
+    }
 
     // Generate .dot files
     if (GenerateDot) {

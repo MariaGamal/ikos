@@ -866,7 +866,6 @@ def ikos_analyzer(db_path, pp_path, opt):
     if opt.generate_dot:
         cmd += ['-generate-dot', '-generate-dot-dir', opt.generate_dot_dir]
     if opt.display_dependency:
-        print("****************** DISPLAY CUSTOM DEPENDENCY ANALYSIS ******************")
         cmd.append('-display-dependency')
 
     # add -name-values if necessary
