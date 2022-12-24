@@ -243,6 +243,11 @@ def parse_arguments(argv):
                           metavar='',
                           help='Specify a value for argc',
                           type=args.Integer(min=0))
+    analysis.add_argument('--display-dependency',
+                          dest='display_dependency',
+                          help='Display the Dependency between iterations',
+                          action='store_true',
+                          default=False)
 
     # Compile options
     compiler = parser.add_argument_group('Compile Options')
@@ -335,11 +340,6 @@ def parse_arguments(argv):
 
     # Debug options
     debug = parser.add_argument_group('Debug Options')
-    debug.add_argument('--display-dependency',
-                       dest='display_dependency',
-                       help='Display the Dependency between iterations',
-                       action='store_true',
-                       default=False)
     debug.add_argument('--display-llvm',
                        dest='display_llvm',
                        help='Display the LLVM bitcode as text',
@@ -866,7 +866,7 @@ def ikos_analyzer(db_path, pp_path, opt):
     if opt.generate_dot:
         cmd += ['-generate-dot', '-generate-dot-dir', opt.generate_dot_dir]
     if opt.display_dependency:
-        print("****************** DISPLAU CUSTOM DEPENDENCY ANALYSIS ******************")
+        print("****************** DISPLAY CUSTOM DEPENDENCY ANALYSIS ******************")
         cmd.append('-display-dependency')
 
     # add -name-values if necessary

@@ -477,6 +477,11 @@ static llvm::cl::opt< int > Argc("argc",
                                  llvm::cl::desc("Specify a value for argc"),
                                  llvm::cl::init(-1),
                                  llvm::cl::cat(AnalysisCategory));
+                            
+static llvm::cl::opt< bool > DisplayDependency(
+    "display-dependency",
+    llvm::cl::desc("Display the Dependency between iterations"),
+    llvm::cl::cat(AnalysisCategory));
 
 /// @}
 /// \name Import options
@@ -579,11 +584,6 @@ static llvm::cl::opt< bool > DisplayFixpointParameters(
 static llvm::cl::opt< bool > DisplayAR(
     "display-ar",
     llvm::cl::desc("Display the Abstract Representation as text"),
-    llvm::cl::cat(DebugCategory));
-
-static llvm::cl::opt< bool > DisplayDependency(
-    "display-dependency",
-    llvm::cl::desc("Display the Dependency between iterations"),
     llvm::cl::cat(DebugCategory));
 
 static llvm::cl::opt< bool > TraceARStmts(
@@ -870,11 +870,11 @@ static void generate_dot(ar::Bundle* bundle,
 
 /// \brief Main for ikos-analyzer
 int main(int argc, char** argv) {
-  // analyzer::log::info("My analysis");
-  // analyzer::log::info("argc " + std::to_string(argc));
-  // for (int i = 0; i < argc; i++) {
-  //   analyzer::log::info(std::to_string(i) + " " + argv[i]);
-  // }
+  analyzer::log::info("My analysis");
+  analyzer::log::info("argc " + std::to_string(argc));
+  for (int i = 0; i < argc; i++) {
+    analyzer::log::info(std::to_string(i) + " " + argv[i]);
+  }
   llvm::InitLLVM x(argc, argv);
 
   // Program name
