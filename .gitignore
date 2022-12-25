@@ -41,3 +41,4 @@ __pycache__
 rebuild.sh
 re.sh
 ikos-tests
+.vscode

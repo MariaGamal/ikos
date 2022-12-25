@@ -1030,7 +1030,7 @@ int main(int argc, char** argv) {
       analyzer::ScopeTimerDatabase t(output_db.times,
                                      "ikos-analyzer.display-dependency");
       // Save the output of DisplayAR
-      
+      // ikos --display-ar argv[] >> 
       // ar::DependencyGraph dg(bundle);
       // dg.print(analyzer::log::msg().stream());
     }
