@@ -43,6 +43,7 @@
  ******************************************************************************/
 
 #include <iostream>
+#include <fstream>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -1029,8 +1030,12 @@ int main(int argc, char** argv) {
       analyzer::log::info("**************** DISPLAY CUSTOM DEPENDENCY ANALYSIS ****************");
       analyzer::ScopeTimerDatabase t(output_db.times,
                                      "ikos-analyzer.display-dependency");
-      // Save the output of DisplayAR
-      // ikos --display-ar argv[] >> 
+                              
+      std::ofstream myfile("ar-sample.txt");
+      ar::TextFormatter formatter(make_format_options());
+      formatter.format(myfile, bundle);
+      myfile.close();
+
       // ar::DependencyGraph dg(bundle);
       // dg.print(analyzer::log::msg().stream());
     }
