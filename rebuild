@@ -9,7 +9,7 @@ cd $BASEDIR
 rm -rf build
 
 # build ikos
-mkdir -p build
+mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=. ..
 make -j5
