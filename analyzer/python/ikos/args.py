@@ -243,7 +243,7 @@ domains = (
      ' with variable packing'),
 )
 
-default_domain = 'interval'
+default_domain = 'apron-octagon'
 
 globals_init_policies = (
     ('all', 'Initialize all global variables'),
