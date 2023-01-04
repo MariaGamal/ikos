@@ -42,4 +42,4 @@ rebuild.sh
 re.sh
 ikos-tests
 .vscode
-*.txt
+ar-sample*
