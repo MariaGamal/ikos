@@ -38,8 +38,6 @@ __pycache__
 *.db
 
 # Mine
-rebuild.sh
-re.sh
-ikos-tests
 .vscode
+ikos-tests
 ar-sample*
