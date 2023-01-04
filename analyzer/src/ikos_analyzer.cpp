@@ -1031,7 +1031,7 @@ int main(int argc, char** argv) {
       analyzer::ScopeTimerDatabase t(output_db.times,
                                      "ikos-analyzer.display-dependency");
                               
-      std::ofstream myfile("ar-sample.txt");
+      std::ofstream myfile("ar-sample");
       ar::TextFormatter formatter(make_format_options());
       formatter.format(myfile, bundle);
       myfile.close();
