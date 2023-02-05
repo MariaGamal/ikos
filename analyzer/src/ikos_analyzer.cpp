@@ -42,8 +42,8 @@
  *
  ******************************************************************************/
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -478,7 +478,7 @@ static llvm::cl::opt< int > Argc("argc",
                                  llvm::cl::desc("Specify a value for argc"),
                                  llvm::cl::init(-1),
                                  llvm::cl::cat(AnalysisCategory));
-                            
+
 static llvm::cl::opt< bool > DisplayDependency(
     "display-dependency",
     llvm::cl::desc("Display the Dependency between iterations"),
@@ -1024,13 +1024,12 @@ int main(int argc, char** argv) {
       ar::TextFormatter formatter(make_format_options());
       formatter.format(analyzer::log::msg().stream(), bundle);
     }
-    
-    if (DisplayDependency)
-    {
-      analyzer::log::info("**************** DISPLAY CUSTOM DEPENDENCY ANALYSIS ****************");
+
+    if (DisplayDependency) {
+      analyzer::log::info("Running Dependency Analysis");
       analyzer::ScopeTimerDatabase t(output_db.times,
                                      "ikos-analyzer.display-dependency");
-                              
+
       std::ofstream myfile("ar-sample");
       ar::TextFormatter formatter(make_format_options());
       formatter.format(myfile, bundle);
