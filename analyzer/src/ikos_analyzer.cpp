@@ -871,11 +871,11 @@ static void generate_dot(ar::Bundle* bundle,
 
 /// \brief Main for ikos-analyzer
 int main(int argc, char** argv) {
-  analyzer::log::info("My analysis");
-  analyzer::log::info("argc " + std::to_string(argc));
-  for (int i = 0; i < argc; i++) {
-    analyzer::log::info(std::to_string(i) + " " + argv[i]);
-  }
+  // analyzer::log::info("My analysis");
+  // analyzer::log::info("argc " + std::to_string(argc));
+  // for (int i = 0; i < argc; i++) {
+  //   analyzer::log::info(std::to_string(i) + " " + argv[i]);
+  // }
   llvm::InitLLVM x(argc, argv);
 
   // Program name
@@ -1036,8 +1036,15 @@ int main(int argc, char** argv) {
       formatter.format(myfile, bundle);
       myfile.close();
 
-      // ar::DependencyGraph dg(bundle);
-      // dg.print(analyzer::log::msg().stream());
+      // LivenessFixpointIterator::FwdFixpointIterator::cfg()
+      // return the control flow graph
+
+      for (auto it = bundle->function_begin(), et = bundle->function_end(); it != et; ++it) {
+        ar::Function* fun = *it;
+        // std::string name = fun->name;
+        // std::cout << name << std::endl;
+        // ar::Code* code = fun->;
+      }
     }
 
     // Generate .dot files
