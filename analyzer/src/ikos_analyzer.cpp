@@ -1147,9 +1147,7 @@ int main(int argc, char** argv) {
       pointer.dump(analyzer::log::msg().stream());
     }
 
-    std::cout << "Booooooooooooooooooodyyyyyyyyyyyyyyyyyy" << std::endl;
     std::cout << DataFilename << std::endl;
-    std::cout << "Booooooooooooooooooodyyyyyyyyyyyyyyyyyy" << std::endl;
 
     // Final step, run a value analysis, and check properties on the results
     if (Procedural == analyzer::Procedural::Interprocedural) {

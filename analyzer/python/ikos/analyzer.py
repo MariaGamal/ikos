@@ -98,7 +98,14 @@ def parse_arguments(argv):
                         nargs=0,
                         help='Show ikos version')
 
+    ###### ours ######
+    grad = parser.add_argument_group('Grad Options')
+    grad.add_argument('--lines',
+                    dest="lines",
+                    metavar='<file>',
+                    help='Data File that includes Loops Line numbers')
     # Analysis options
+    
     analysis = parser.add_argument_group('Analysis Options')
     analysis.add_argument('-a', '--analyses',
                           dest='analyses',
@@ -494,13 +501,6 @@ def parse_arguments(argv):
                         help='Report verbosity (default: 1)',
                         type=args.Integer(min=1, max=4))
 
-    ###### ours ######
-    grad = parser.add_argument_group('Grad Options')
-    grad.add_argument('--lines',
-                    dest="lines",
-                    metavar='<file>',
-                    help='Data File that includes Loops Line numbers')
-
     # Resource options
     resource = parser.add_argument_group('Resources Options')
     resource.add_argument('--cpu',
@@ -862,7 +862,7 @@ def ikos_analyzer(db_path, pp_path, opt):
 
     # grad options
     if opt.lines:
-        cmd.append("-lines")
+        cmd.append('-lines=%s' % opt.lines)
 
 
     if opt.display_ar:
