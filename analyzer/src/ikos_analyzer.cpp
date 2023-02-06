@@ -555,6 +555,14 @@ static llvm::cl::opt< bool > NoSimplifyUpcastComparison(
     llvm::cl::desc("Do not simplify the implicit upcast before a comparison"),
     llvm::cl::cat(PassCategory));
 
+static llvm::cl::OptionCategory GradCategory("Grad Options");
+
+static llvm::cl::opt< std::string > DataFilename(
+    "lines",
+    llvm::cl::desc("Specify the name of the data file"),
+    llvm::cl::value_desc("filename"),
+    llvm::cl::cat(GradCategory));
+
 /// @}
 /// \name Debug options
 /// @{
@@ -1138,6 +1146,10 @@ int main(int argc, char** argv) {
     if (DisplayPointer) {
       pointer.dump(analyzer::log::msg().stream());
     }
+
+    std::cout << "Booooooooooooooooooodyyyyyyyyyyyyyyyyyy" << std::endl;
+    std::cout << DataFilename << std::endl;
+    std::cout << "Booooooooooooooooooodyyyyyyyyyyyyyyyyyy" << std::endl;
 
     // Final step, run a value analysis, and check properties on the results
     if (Procedural == analyzer::Procedural::Interprocedural) {

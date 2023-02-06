@@ -494,6 +494,13 @@ def parse_arguments(argv):
                         help='Report verbosity (default: 1)',
                         type=args.Integer(min=1, max=4))
 
+    ###### ours ######
+    grad = parser.add_argument_group('Grad Options')
+    grad.add_argument('--lines',
+                    dest="lines",
+                    metavar='<file>',
+                    help='Data File that includes Loops Line numbers')
+
     # Resource options
     resource = parser.add_argument_group('Resources Options')
     resource.add_argument('--cpu',
@@ -823,6 +830,8 @@ def ikos_analyzer(db_path, pp_path, opt):
         cmd.append('-hardware-addresses-file=%s' % opt.hardware_addresses_file)
     if opt.argc is not None:
         cmd.append('-argc=%d' % opt.argc)
+    if opt.display_dependency:
+        cmd.append('-display-dependency')
 
     # import options
     cmd.append('-allow-dbg-mismatch')
@@ -851,6 +860,11 @@ def ikos_analyzer(db_path, pp_path, opt):
     cmd += ['-display-checks=%s' % opt.display_checks,
             '-display-inv=%s' % opt.display_inv]
 
+    # grad options
+    if opt.lines:
+        cmd.append("-lines")
+
+
     if opt.display_ar:
         cmd.append('-display-ar')
     if opt.trace_ar_stmts:
@@ -865,8 +879,6 @@ def ikos_analyzer(db_path, pp_path, opt):
         cmd.append('-display-fixpoint-parameters')
     if opt.generate_dot:
         cmd += ['-generate-dot', '-generate-dot-dir', opt.generate_dot_dir]
-    if opt.display_dependency:
-        cmd.append('-display-dependency')
 
     # add -name-values if necessary
     if (opt.display_checks in ('all', 'fail') or
