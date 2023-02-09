@@ -298,7 +298,7 @@ opt_levels = (
     ('aggressive', 'Aggressive optimizations (not recommended)'),
 )
 
-default_opt_level = 'basic'
+default_opt_level = 'none'
 
 # Debug options choices
 
