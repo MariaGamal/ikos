@@ -555,13 +555,29 @@ static llvm::cl::opt< bool > NoSimplifyUpcastComparison(
     llvm::cl::desc("Do not simplify the implicit upcast before a comparison"),
     llvm::cl::cat(PassCategory));
 
-static llvm::cl::OptionCategory GradCategory("Grad Options");
+// ADDED OLD CODE START
+// static llvm::cl::OptionCategory GradCategory("Grad Options");
 
-static llvm::cl::opt< std::string > DataFilename(
-    "lines",
-    llvm::cl::desc("Specify the name of the data file"),
-    llvm::cl::value_desc("filename"),
-    llvm::cl::cat(GradCategory));
+// static llvm::cl::opt< std::string > DataFilename(
+//     "lines",
+//     llvm::cl::desc("Specify the name of the data file"),
+//     llvm::cl::value_desc("filename"),
+//     llvm::cl::cat(GradCategory));
+
+// std::string read_file(const std::string& file_path) {
+//   std::ifstream file(file_path);
+//   if (!file.is_open()) {
+//     std::cerr << "Failed to open file: " << file_path << std::endl;
+//     return "";
+//   }
+
+//   std::string content((std::istreambuf_iterator< char >(file)),
+//                       std::istreambuf_iterator< char >());
+//   file.close();
+
+//   return content;
+// }
+// ADDED OLD CODE END
 
 /// @}
 /// \name Debug options
@@ -1046,7 +1062,9 @@ int main(int argc, char** argv) {
       // LivenessFixpointIterator::FwdFixpointIterator::cfg()
       // return the control flow graph
 
-      for (auto it = bundle->function_begin(), et = bundle->function_end(); it != et; ++it) {
+      for (auto it = bundle->function_begin(), et = bundle->function_end();
+           it != et;
+           ++it) {
         ar::Function* fun = *it;
         // std::string name = fun->name;
         // std::cout << name << std::endl;
@@ -1147,7 +1165,12 @@ int main(int argc, char** argv) {
       pointer.dump(analyzer::log::msg().stream());
     }
 
-    std::cout << DataFilename << std::endl;
+    // ADDED TEST START
+    // std::string content = read_file(DataFilename);
+    // std::cout << content << std::endl;
+
+    // std::cout << DataFilename << std::endl;
+    // ADDED TEST END
 
     // Final step, run a value analysis, and check properties on the results
     if (Procedural == analyzer::Procedural::Interprocedural) {

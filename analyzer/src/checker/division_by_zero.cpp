@@ -41,14 +41,47 @@
  *
  ******************************************************************************/
 
+// ADDED INCLUDES START
+#include <fstream>
+#include <iostream>
+// ADDED INCLUDES END
+
 #include <ikos/analyzer/analysis/literal.hpp>
 #include <ikos/analyzer/checker/division_by_zero.hpp>
 #include <ikos/analyzer/json/helper.hpp>
 #include <ikos/analyzer/support/cast.hpp>
 #include <ikos/analyzer/util/log.hpp>
 
+// ADDED INCLUDES START
+#include <llvm/Support/CommandLine.h>
+#include <ikos/analyzer/support/reader.hpp>
+// ADDED INCLUDES END
+
 namespace ikos {
 namespace analyzer {
+
+// ADDED ARG START
+static llvm::cl::OptionCategory GradCategory("Grad Options");
+static llvm::cl::opt< std::string > DataFilename(
+    "lines",
+    llvm::cl::desc("Specify the name of the data file"),
+    llvm::cl::value_desc("filename"),
+    llvm::cl::cat(GradCategory));
+
+std::string read_file(const std::string& file_path) {
+  std::ifstream file(file_path);
+  if (!file.is_open()) {
+    std::cerr << "Failed to open file: " << file_path << std::endl;
+    return "";
+  }
+
+  std::string content((std::istreambuf_iterator< char >(file)),
+                      std::istreambuf_iterator< char >());
+  file.close();
+
+  return content;
+}
+// ADDED ARG END
 
 DivisionByZeroChecker::DivisionByZeroChecker(Context& ctx) : Checker(ctx) {}
 
@@ -83,6 +116,13 @@ void DivisionByZeroChecker::check(ar::Statement* stmt,
 
 DivisionByZeroChecker::CheckResult DivisionByZeroChecker::check_division(
     ar::BinaryOperation* stmt, const value::AbstractDomain& inv) {
+  // ADDED START
+  std::string content = read_file(DataFilename);
+  std::cout << content << std::endl;
+
+  std::cout << DataFilename << std::endl;
+  // ADDED END
+
   if (inv.is_normal_flow_bottom()) {
     // Statement unreachable
     if (auto msg = this->display_division_check(Result::Unreachable, stmt)) {
