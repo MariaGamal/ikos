@@ -93,9 +93,38 @@ const char* DivisionByZeroChecker::description() const {
   return "Division by zero checker";
 }
 
+bool parsed = false;
+
+struct Loop {
+	int first_part_start;
+	int first_part_end;
+	int second_part_start;
+	int second_part_end;
+	std::vector<ar::Statement*> first_part_stmts;
+	// This might not be needed
+	std::vector<ar::Statement*> second_part_stmts;
+};
+
+std::vector<struct Loop> loops;
+
 void DivisionByZeroChecker::check(ar::Statement* stmt,
                                   const value::AbstractDomain& inv,
                                   CallContext* call_context) {
+  //stmt->dump(std::cout);
+  //std::cout << " ";
+  //inv.dump(std::cout);
+  //std::cout << "\n";
+  if (!parsed) {
+	this->parseMetaFile(&loops, DataFilename);
+	parsed = true;
+  }
+
+  if(!this->isTarget(stmt)) return;
+
+  if(this->isFirstPart(stmt)) this->handleFirstPartStmt(stmt, inv, call_context);
+  else this->handleSecondPartStmt(stmt, inv, call_context);
+  
+
   if (auto bin = dyn_cast< ar::BinaryOperation >(stmt)) {
     if (bin->op() == ar::BinaryOperation::UDiv ||
         bin->op() == ar::BinaryOperation::SDiv ||
@@ -175,6 +204,36 @@ DivisionByZeroChecker::CheckResult DivisionByZeroChecker::check_division(
     return {CheckKind::DivisionByZero, Result::Ok, {}};
   }
 }
+
+
+// TODO
+void DivisionByZeroChecker::parseMetaFile(std::vector<struct Loop> *loops, std::string filename) {}
+
+// TODO
+// Check if stmt is load, store, or assignment inside a target loop
+bool DivisionByZeroChecker::isTarget(ar::Statement* stmt) {}
+
+// TODO
+bool DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {}
+
+// TODO
+// Just store statement in appropriate Loop struct in loops
+void DivisionByZeroChecker::handleFirstPartStmt(ar::Statement* stmt, 
+		                 const value::AbstractDomain& inv,
+						 CallContext* call_context) {}
+
+// TODO
+// Compare with stored statements
+void DivisionByZeroChecker::handleSecondPartStmt(ar::Statement* stmt, 
+		                 const value::AbstractDomain& inv,
+						 CallContext* call_context) {}
+
+// TODO
+// Get the statement where the variable/value is defined
+// This will probably be needed in handleSecondPartStmt function
+// Not sure for now if it's needed for Value, Variable, or both
+ar::Statement* getValueOrigin(ar::Value* stmt) {}
+ar::Statement* getVariableOrigin(ar::Variable* stmt) {}
 
 llvm::Optional< LogMessage > DivisionByZeroChecker::display_division_check(
     Result result, ar::BinaryOperation* stmt) const {

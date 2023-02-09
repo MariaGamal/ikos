@@ -80,6 +80,24 @@ private:
   CheckResult check_division(ar::BinaryOperation* stmt,
                              const value::AbstractDomain& inv);
 
+  void parseMetaFile(std::vector<struct Loop> *loops, std::string filename);
+
+  bool isTarget(ar::Statement* stmt);
+
+  bool isFirstPart(ar::Statement* stmt);
+
+  void handleFirstPartStmt(ar::Statement* stmt, 
+		                   const value::AbstractDomain& inv,
+						   CallContext* call_context);
+
+  void handleSecondPartStmt(ar::Statement* stmt, 
+		                    const value::AbstractDomain& inv,
+						    CallContext* call_context);
+
+  ar::Statement* getValueOrigin(ar::Value* stmt);
+
+  ar::Statement* getVariableOrigin(ar::Variable* stmt);
+
 private:
   /// \brief Dispay the check for the given division, if requested
   llvm::Optional< LogMessage > display_division_check(
