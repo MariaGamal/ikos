@@ -86,9 +86,7 @@ private:
 
   bool isFirstPart(ar::Statement* stmt);
 
-  void handleFirstPartStmt(ar::Statement* stmt, 
-		                   const value::AbstractDomain& inv,
-						   CallContext* call_context);
+  void handleFirstPartStmt(ar::Statement* stmt, Loop loop);
 
   void handleSecondPartStmt(ar::Statement* stmt, 
 		                    const value::AbstractDomain& inv,

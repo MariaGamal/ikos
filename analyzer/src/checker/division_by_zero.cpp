@@ -51,6 +51,7 @@
 #include <ikos/analyzer/json/helper.hpp>
 #include <ikos/analyzer/support/cast.hpp>
 #include <ikos/analyzer/util/log.hpp>
+#include <ikos/analyzer/util/source_location.hpp>
 
 // ADDED INCLUDES START
 #include <llvm/Support/CommandLine.h>
@@ -96,34 +97,42 @@ const char* DivisionByZeroChecker::description() const {
 bool parsed = false;
 
 struct Loop {
-	int first_part_start;
-	int first_part_end;
-	int second_part_start;
-	int second_part_end;
-	std::vector<ar::Statement*> first_part_stmts;
-	// This might not be needed
-	std::vector<ar::Statement*> second_part_stmts;
+  int first_part_start;
+  int first_part_end;
+  int second_part_start;
+  int second_part_end;
+  std::vector< ar::Statement* > first_part_stmts;
+  // This might not be needed
+  std::vector< ar::Statement* > second_part_stmts;
 };
 
-std::vector<struct Loop> loops;
+std::vector< struct Loop > loops;
 
 void DivisionByZeroChecker::check(ar::Statement* stmt,
                                   const value::AbstractDomain& inv,
                                   CallContext* call_context) {
-  //stmt->dump(std::cout);
-  //std::cout << " ";
-  //inv.dump(std::cout);
-  //std::cout << "\n";
+  // stmt->dump(std::cout);
+  // std::cout << " ";
+  // inv.dump(std::cout);
+  // std::cout << "\n";
   if (!parsed) {
-	this->parseMetaFile(&loops, DataFilename);
-	parsed = true;
+    std::cout << "Parsing meta file" << std::endl;
+    this->parseMetaFile(&loops, DataFilename);
+    parsed = true;
+    for (auto loop : loops) {
+      std::cout << "first_part_start: " << loop.first_part_start << std::endl;
+      std::cout << "first_part_end: " << loop.first_part_end << std::endl;
+      std::cout << "second_part_start: " << loop.second_part_start << std::endl;
+      std::cout << "second_part_end: " << loop.second_part_end << std::endl;
+      std::cout << "----------------" << std::endl;
+    }
   }
 
-  if(!this->isTarget(stmt)) return;
+  if (!this->isTarget(stmt))
+    return;
 
-  if(this->isFirstPart(stmt)) this->handleFirstPartStmt(stmt, inv, call_context);
-  else this->handleSecondPartStmt(stmt, inv, call_context);
-  
+  if (!this->isFirstPart(stmt))
+    this->handleSecondPartStmt(stmt, inv, call_context);
 
   if (auto bin = dyn_cast< ar::BinaryOperation >(stmt)) {
     if (bin->op() == ar::BinaryOperation::UDiv ||
@@ -145,13 +154,6 @@ void DivisionByZeroChecker::check(ar::Statement* stmt,
 
 DivisionByZeroChecker::CheckResult DivisionByZeroChecker::check_division(
     ar::BinaryOperation* stmt, const value::AbstractDomain& inv) {
-  // ADDED START
-  std::string content = read_file(DataFilename);
-  std::cout << content << std::endl;
-
-  std::cout << DataFilename << std::endl;
-  // ADDED END
-
   if (inv.is_normal_flow_bottom()) {
     // Statement unreachable
     if (auto msg = this->display_division_check(Result::Unreachable, stmt)) {
@@ -205,35 +207,82 @@ DivisionByZeroChecker::CheckResult DivisionByZeroChecker::check_division(
   }
 }
 
+void DivisionByZeroChecker::parseMetaFile(std::vector< struct Loop >* loops,
+                                          std::string filename) {
+  std::string content = read_file(filename);
 
-// TODO
-void DivisionByZeroChecker::parseMetaFile(std::vector<struct Loop> *loops, std::string filename) {}
+  // parse the content of the file
+  std::stringstream ss(content);
+  std::string line;
+  while (std::getline(ss, line, '\n')) {
+    // parse the line
+    std::stringstream ss2(line);
+    std::string num;
+    struct Loop loop;
 
-// TODO
-// Check if stmt is load, store, or assignment inside a target loop
-bool DivisionByZeroChecker::isTarget(ar::Statement* stmt) {}
+    // get the first integer
+    std::getline(ss2, num, ' ');
+    loop.first_part_start = std::stoi(num);
 
-// TODO
-bool DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {}
+    // get the second integer
+    std::getline(ss2, num, ' ');
+    loop.first_part_end = std::stoi(num);
 
-// TODO
+    // get the third integer
+    std::getline(ss2, num, ' ');
+    loop.second_part_start = std::stoi(num);
+
+    // get the fourth integer
+    std::getline(ss2, num, ' ');
+    loop.second_part_end = std::stoi(num);
+
+    // add the loop to the vector
+    loops->push_back(loop);
+  }
+}
+
+// Check if stmt is store, load or assignment inside a target loop
+bool DivisionByZeroChecker::isTarget(ar::Statement* stmt) {
+  // load = 8, store = 9, assignment = 0
+  if (stmt->kind() == 8 || stmt->kind() == 9) {
+    return true;
+  }
+  return false;
+}
+
+bool DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {
+  SourceLocation ss = source_location(stmt);
+  unsigned int line = ss.line();
+  std::cout << line << std::endl;
+  for (auto loop : loops) {
+    if (line >= loop.first_part_start && line <= loop.first_part_end) {
+      this->handleFirstPartStmt(stmt, loop);
+      return true;
+    }
+  return false;
+  }
+}
+
 // Just store statement in appropriate Loop struct in loops
-void DivisionByZeroChecker::handleFirstPartStmt(ar::Statement* stmt, 
-		                 const value::AbstractDomain& inv,
-						 CallContext* call_context) {}
+void DivisionByZeroChecker::handleFirstPartStmt(
+    ar::Statement* stmt, Loop loop) {
+      loop.first_part_stmts-> push_back(stmt);
+    }
+      
 
 // TODO
 // Compare with stored statements
-void DivisionByZeroChecker::handleSecondPartStmt(ar::Statement* stmt, 
-		                 const value::AbstractDomain& inv,
-						 CallContext* call_context) {}
+// void DivisionByZeroChecker::handleSecondPartStmt(
+//     ar::Statement* stmt,
+//     const value::AbstractDomain& inv,
+//     CallContext* call_context) {}
 
 // TODO
 // Get the statement where the variable/value is defined
 // This will probably be needed in handleSecondPartStmt function
 // Not sure for now if it's needed for Value, Variable, or both
-ar::Statement* getValueOrigin(ar::Value* stmt) {}
-ar::Statement* getVariableOrigin(ar::Variable* stmt) {}
+// ar::Statement* getValueOrigin(ar::Value* stmt) {}
+// ar::Statement* getVariableOrigin(ar::Variable* stmt) {}
 
 llvm::Optional< LogMessage > DivisionByZeroChecker::display_division_check(
     Result result, ar::BinaryOperation* stmt) const {
