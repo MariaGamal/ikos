@@ -43,8 +43,6 @@
 
 #pragma once
 
-#include <utility>
-
 #include <ikos/analyzer/checker/checker.hpp>
 
 namespace ikos {

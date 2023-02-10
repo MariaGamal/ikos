@@ -44,7 +44,6 @@
 // ADDED INCLUDES START
 #include <fstream>
 #include <iostream>
-#include <utility>
 // ADDED INCLUDES END
 
 #include <ikos/analyzer/analysis/literal.hpp>
@@ -126,17 +125,6 @@ void DivisionByZeroChecker::check(ar::Statement* stmt,
     this->handleFirstPartStmt(stmt, is_first_part.second);
   else
     this->handleSecondPartStmt(stmt, inv, call_context);
-
-  // print the whole loops vector
-  for (auto loop : loops) {
-    std::cout << "===========================" << std::endl;
-    std::cout << "first_part_stmts: " << std::endl;
-    for (auto stmt : loop.first_part_stmts) {
-      stmt->dump(std::cout);
-      std::cout << std::endl;
-    }
-    std::cout << "===========================" << std::endl;
-  }
 
   if (auto bin = dyn_cast< ar::BinaryOperation >(stmt)) {
     if (bin->op() == ar::BinaryOperation::UDiv ||
