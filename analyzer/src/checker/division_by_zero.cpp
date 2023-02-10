@@ -207,23 +207,23 @@ void DivisionByZeroChecker::parseMetaFile(std::vector< struct Loop >* loops,
                                           std::string filename) {
   std::string content = read_file(filename);
 
-  std::stringstream ss(content);
+  std::stringstream string_stream(content);
   std::string line;
-  while (std::getline(ss, line, '\n')) {
-    std::stringstream ss2(line);
+  while (std::getline(string_stream, line, '\n')) {
+    std::stringstream string_stream_2(line);
     std::string num;
     struct Loop loop;
 
-    std::getline(ss2, num, ' ');
+    std::getline(string_stream_2, num, ' ');
     loop.first_part_start = std::stoi(num);
 
-    std::getline(ss2, num, ' ');
+    std::getline(string_stream_2, num, ' ');
     loop.first_part_end = std::stoi(num);
 
-    std::getline(ss2, num, ' ');
+    std::getline(string_stream_2, num, ' ');
     loop.second_part_start = std::stoi(num);
 
-    std::getline(ss2, num, ' ');
+    std::getline(string_stream_2, num, ' ');
     loop.second_part_end = std::stoi(num);
 
     loops->push_back(loop);
@@ -240,8 +240,8 @@ bool DivisionByZeroChecker::isTarget(ar::Statement* stmt) {
 }
 
 bool DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {
-  SourceLocation ss = source_location(stmt);
-  unsigned int line = ss.line();
+  SourceLocation source = source_location(stmt);
+  unsigned int line = source.line();
   std::cout << line << std::endl;
   for (auto loop : loops) {
     if (line >= loop.first_part_start && line <= loop.first_part_end) {
@@ -250,13 +250,12 @@ bool DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {
     }
   }
   return false;
-
 }
 
 // Just store statement in appropriate Loop struct in loops
 void DivisionByZeroChecker::handleFirstPartStmt(ar::Statement* stmt,
                                                 Loop* loop) {
-    loop->first_part_stmts.push_back(stmt);
+  loop->first_part_stmts.push_back(stmt);
 }
 
 // TODO

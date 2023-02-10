@@ -2,15 +2,84 @@
 
 BASEDIR=$(dirname "$0")
 
-# make sure the script is run from the right directory
-cd $BASEDIR
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RESET='\033[0m'
 
-# clean up
-rm -rf build
+function clean() {
+    echo -e "${RED}Cleaning...${RESET}"
+    cd $BASEDIR
 
-# build ikos
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=. ..
-make -j4
-make install
+    if [ -d build ]; then
+        rm -rf build
+    fi
+    echo -e "${GREEN}Cleaning Done!${RESET}"
+}
+
+function build() {
+    echo -e "${BLUE}Building...${RESET}"
+    cd $BASEDIR
+
+    if [ ! -d build ]; then
+        echo -e "${YELLOW}Creating Build Directory...${RESET}"
+        mkdir build
+        echo -e "${YELLOW}Creating Build Directory Done!${RESET}"
+    fi
+
+    cd build
+
+    echo -e "${YELLOW}Running CMake...${RESET}"
+    cmake -DCMAKE_INSTALL_PREFIX=. ..
+    echo -e "${YELLOW}Running CMake Done!${RESET}"
+
+    echo -e "${YELLOW}Running Build...${RESET}"
+    make -j5
+    echo -e "${YELLOW}Running Build Done!${RESET}"
+
+    cd $BASEDIR
+    echo -e "${GREEN}Building Done!${RESET}"
+}
+
+function install() {
+    echo -e "${BLUE}Installing...${RESET}"
+    cd $BASEDIR/build
+    make install
+    echo -e "${GREEN}Installing Done!${RESET}"
+}
+
+function usage() {
+    echo "Usage:"
+    echo -e "    ${BLUE}$0${RESET} ${YELLOW}<arg>\n${RESET}"
+    echo "Available arguments:"
+    echo -e "    ${GREEN}clean${RESET}     Clean Everything (Remove Old Build Files)."
+    echo -e "    ${GREEN}install${RESET}   Reinstall The Existing Project."
+    echo -e "    ${GREEN}all${RESET}       Clean Everything. Then, Build and Install.\n"
+    echo "Example:"
+    echo -e "    ${BLUE}$0${RESET} ${GREEN}all${RESET}"
+}
+
+
+if [ "$#" -gt 1 ]; then
+    usage
+    exit 1
+fi
+
+if [ "$#" -eq 1 ]; then
+    if [ "$1" == "clean" ]; then
+        clean
+    elif [ "$1" == "install" ]; then
+        install
+    elif [ "$1" == "all" ]; then
+        clean
+        build
+        install
+    else
+        usage
+        exit 1
+    fi
+else
+    usage
+    exit 1
+fi
