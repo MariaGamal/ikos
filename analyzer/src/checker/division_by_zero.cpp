@@ -111,10 +111,6 @@ std::vector< struct Loop > loops;
 void DivisionByZeroChecker::check(ar::Statement* stmt,
                                   const value::AbstractDomain& inv,
                                   CallContext* call_context) {
-  // stmt->dump(std::cout);
-  // std::cout << " ";
-  // inv.dump(std::cout);
-  // std::cout << "\n";
   if (!parsed) {
     std::cout << "Parsing meta file" << std::endl;
     this->parseMetaFile(&loops, DataFilename);
@@ -211,32 +207,25 @@ void DivisionByZeroChecker::parseMetaFile(std::vector< struct Loop >* loops,
                                           std::string filename) {
   std::string content = read_file(filename);
 
-  // parse the content of the file
   std::stringstream ss(content);
   std::string line;
   while (std::getline(ss, line, '\n')) {
-    // parse the line
     std::stringstream ss2(line);
     std::string num;
     struct Loop loop;
 
-    // get the first integer
     std::getline(ss2, num, ' ');
     loop.first_part_start = std::stoi(num);
 
-    // get the second integer
     std::getline(ss2, num, ' ');
     loop.first_part_end = std::stoi(num);
 
-    // get the third integer
     std::getline(ss2, num, ' ');
     loop.second_part_start = std::stoi(num);
 
-    // get the fourth integer
     std::getline(ss2, num, ' ');
     loop.second_part_end = std::stoi(num);
 
-    // add the loop to the vector
     loops->push_back(loop);
   }
 }
@@ -256,26 +245,26 @@ bool DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {
   std::cout << line << std::endl;
   for (auto loop : loops) {
     if (line >= loop.first_part_start && line <= loop.first_part_end) {
-      this->handleFirstPartStmt(stmt, loop);
+      this->handleFirstPartStmt(stmt, &loop);
       return true;
     }
-  return false;
   }
+  return false;
+
 }
 
 // Just store statement in appropriate Loop struct in loops
-void DivisionByZeroChecker::handleFirstPartStmt(
-    ar::Statement* stmt, Loop loop) {
-      loop.first_part_stmts-> push_back(stmt);
-    }
-      
+void DivisionByZeroChecker::handleFirstPartStmt(ar::Statement* stmt,
+                                                Loop* loop) {
+    loop->first_part_stmts.push_back(stmt);
+}
 
 // TODO
 // Compare with stored statements
-// void DivisionByZeroChecker::handleSecondPartStmt(
-//     ar::Statement* stmt,
-//     const value::AbstractDomain& inv,
-//     CallContext* call_context) {}
+void DivisionByZeroChecker::handleSecondPartStmt(
+    ar::Statement* stmt,
+    const value::AbstractDomain& inv,
+    CallContext* call_context) {}
 
 // TODO
 // Get the statement where the variable/value is defined
