@@ -43,6 +43,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include <ikos/analyzer/checker/checker.hpp>
 
 namespace ikos {
@@ -80,17 +82,17 @@ private:
   CheckResult check_division(ar::BinaryOperation* stmt,
                              const value::AbstractDomain& inv);
 
-  void parseMetaFile(std::vector<struct Loop> *loops, std::string filename);
+  void parseMetaFile(std::vector< struct Loop >* loops, std::string filename);
 
   bool isTarget(ar::Statement* stmt);
 
-  bool isFirstPart(ar::Statement* stmt);
+  std::pair< bool, int > isFirstPart(ar::Statement* stmt);
 
-  void handleFirstPartStmt(ar::Statement* stmt, Loop* loop);
+  void handleFirstPartStmt(ar::Statement* stmt, int loop_index);
 
-  void handleSecondPartStmt(ar::Statement* stmt, 
-		                    const value::AbstractDomain& inv,
-						    CallContext* call_context);
+  void handleSecondPartStmt(ar::Statement* stmt,
+                            const value::AbstractDomain& inv,
+                            CallContext* call_context);
 
   ar::Statement* getValueOrigin(ar::Value* stmt);
 

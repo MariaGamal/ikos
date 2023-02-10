@@ -44,6 +44,7 @@
 // ADDED INCLUDES START
 #include <fstream>
 #include <iostream>
+#include <utility>
 // ADDED INCLUDES END
 
 #include <ikos/analyzer/analysis/literal.hpp>
@@ -112,23 +113,30 @@ void DivisionByZeroChecker::check(ar::Statement* stmt,
                                   const value::AbstractDomain& inv,
                                   CallContext* call_context) {
   if (!parsed) {
-    std::cout << "Parsing meta file" << std::endl;
     this->parseMetaFile(&loops, DataFilename);
     parsed = true;
-    for (auto loop : loops) {
-      std::cout << "first_part_start: " << loop.first_part_start << std::endl;
-      std::cout << "first_part_end: " << loop.first_part_end << std::endl;
-      std::cout << "second_part_start: " << loop.second_part_start << std::endl;
-      std::cout << "second_part_end: " << loop.second_part_end << std::endl;
-      std::cout << "----------------" << std::endl;
-    }
   }
 
   if (!this->isTarget(stmt))
     return;
 
-  if (!this->isFirstPart(stmt))
+  std::pair< bool, int > is_first_part = this->isFirstPart(stmt);
+
+  if (is_first_part.first)
+    this->handleFirstPartStmt(stmt, is_first_part.second);
+  else
     this->handleSecondPartStmt(stmt, inv, call_context);
+
+  // print the whole loops vector
+  for (auto loop : loops) {
+    std::cout << "===========================" << std::endl;
+    std::cout << "first_part_stmts: " << std::endl;
+    for (auto stmt : loop.first_part_stmts) {
+      stmt->dump(std::cout);
+      std::cout << std::endl;
+    }
+    std::cout << "===========================" << std::endl;
+  }
 
   if (auto bin = dyn_cast< ar::BinaryOperation >(stmt)) {
     if (bin->op() == ar::BinaryOperation::UDiv ||
@@ -239,23 +247,22 @@ bool DivisionByZeroChecker::isTarget(ar::Statement* stmt) {
   return false;
 }
 
-bool DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {
+std::pair< bool, int > DivisionByZeroChecker::isFirstPart(ar::Statement* stmt) {
   SourceLocation source = source_location(stmt);
   unsigned int line = source.line();
-  std::cout << line << std::endl;
-  for (auto loop : loops) {
-    if (line >= loop.first_part_start && line <= loop.first_part_end) {
-      this->handleFirstPartStmt(stmt, &loop);
-      return true;
+  for (int loop_index = 0; loop_index < loops.size(); loop_index++) {
+    if (line >= loops[loop_index].first_part_start &&
+        line <= loops[loop_index].first_part_end) {
+      return {true, loop_index};
     }
   }
-  return false;
+  return {false, -1};
 }
 
 // Just store statement in appropriate Loop struct in loops
 void DivisionByZeroChecker::handleFirstPartStmt(ar::Statement* stmt,
-                                                Loop* loop) {
-  loop->first_part_stmts.push_back(stmt);
+                                                int loop_index) {
+  loops[loop_index].first_part_stmts.push_back(stmt);
 }
 
 // TODO
