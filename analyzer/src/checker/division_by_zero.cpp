@@ -41,6 +41,7 @@
  *
  ******************************************************************************/
 
+#include <set>
 // ADDED INCLUDES START
 #include <fstream>
 #include <iostream>
@@ -56,11 +57,17 @@
 // ADDED INCLUDES START
 #include <llvm/Support/CommandLine.h>
 #include <ikos/analyzer/support/reader.hpp>
+#include "ikos/ar/semantic/statement.hpp"
+#include "ikos/ar/semantic/value.hpp"
 // ADDED INCLUDES END
 
 namespace ikos {
 namespace analyzer {
 
+inline bool operator<(const Origin& lhs, const Origin& rhs)
+{
+  return lhs.src < rhs.src;
+}
 // ADDED ARG START
 static llvm::cl::OptionCategory GradCategory("Grad Options");
 static llvm::cl::opt< std::string > DataFilename(
@@ -83,6 +90,7 @@ std::string read_file(const std::string& file_path) {
   return content;
 }
 // ADDED ARG END
+
 
 DivisionByZeroChecker::DivisionByZeroChecker(Context& ctx) : Checker(ctx) {}
 
@@ -108,6 +116,27 @@ struct Loop {
 
 std::vector< struct Loop > loops;
 
+//void printSet(std::set<struct Origin> s) {
+  //for(auto it: s) {
+	  //if (it.kind == ArrayKind) {
+		  //std::cout << "Array ";
+		  //it.src->dump(std::cout);
+		  //std::cout << " ";
+		  //it.index->dump(std::cout);
+		  //std::cout << ", ";
+	  //} else if (it.kind == ConstantKind){
+		  //std::cout << "Constant ";
+		  //it.src->dump(std::cout);
+		  //std::cout << ", ";
+	  //} else {
+		  //std::cout << "Variable ";
+		  //it.src->dump(std::cout);
+		  //std::cout << ", ";
+	  //}
+  //}
+//}
+
+
 void DivisionByZeroChecker::check(ar::Statement* stmt,
                                   const value::AbstractDomain& inv,
                                   CallContext* call_context) {
@@ -118,6 +147,25 @@ void DivisionByZeroChecker::check(ar::Statement* stmt,
 
   if (!this->isTarget(stmt))
     return;
+  //stmt->dump(std::cout);
+  //if ( (stmt->kind() == ar::Statement::StoreKind))
+	   ////(stmt->kind() == ar::Statement::LoadKind)  ||
+	   //{
+	  //std::cout << ":  \n";
+	  //for(int i = 0; i < stmt->num_operands(); ++i) {
+		  //std::cout << "    ";
+		  //ar::Value *v = stmt->operand(i);
+		  //v->dump(std::cout);
+		  //std::cout << ": " << v->kind() << " - ";
+		  //std::set<struct Origin> s = this->getValueOrigin(v,stmt);
+		  //printSet(s);
+		  //std::cout << "\n";
+	  //}
+	  //std::cout << "\n\n";
+  //}
+  //else {
+	  //std::cout << "\n";
+  //}
 
   std::pair< bool, int > is_first_part = this->isFirstPart(stmt);
 
@@ -226,10 +274,9 @@ void DivisionByZeroChecker::parseMetaFile(std::vector< struct Loop >* loops,
   }
 }
 
-// Check if stmt is store, load or assignment inside a target loop
+// Check if stmt is load or store inside a target loop
 bool DivisionByZeroChecker::isTarget(ar::Statement* stmt) {
-  // load = 8, store = 9, assignment = 0
-  if (stmt->kind() == 8 || stmt->kind() == 9) {
+  if (stmt->kind() == ar::Statement::LoadKind || stmt->kind() == ar::Statement::StoreKind) {
     return true;
   }
   return false;
@@ -260,12 +307,35 @@ void DivisionByZeroChecker::handleSecondPartStmt(
     const value::AbstractDomain& inv,
     CallContext* call_context) {}
 
-// TODO
-// Get the statement where the variable/value is defined
-// This will probably be needed in handleSecondPartStmt function
-// Not sure for now if it's needed for Value, Variable, or both
-// ar::Statement* getValueOrigin(ar::Value* stmt) {}
-// ar::Statement* getVariableOrigin(ar::Variable* stmt) {}
+// Get the origin(s) of a variable
+std::set<struct Origin> DivisionByZeroChecker::getValueOrigin(ar::Value* value, ar::Statement* stmt) {
+	std::set<struct Origin> origins;
+
+	ar::Variable* var = dyn_cast<ar::Variable>(value);
+	if (value->is_constant()) {
+	  origins.insert({ConstantKind, value, nullptr});
+	}
+	else if (value->is_global_variable() || value->is_local_variable()) {
+	  origins.insert({VariableKind, value, nullptr});
+	}
+	else if ( (stmt->result_or_null() == var) ) {
+      if (stmt->kind() == ar::Statement::PointerShiftKind) { 
+	    origins.insert({ArrayKind, stmt->operand(0), stmt->operand(2)});
+	  }
+	  else {
+		for (int i = 0; i < stmt->num_operands(); ++i) {
+		  std::set<struct Origin> cur_set = getValueOrigin(stmt->operand(i), stmt);
+		  for (auto it: cur_set) {
+			origins.insert(it);
+		  }
+		}
+	  }
+	}
+	else {
+	  origins = getValueOrigin(value, stmt->prev_statement());
+	}
+	return origins;
+}
 
 llvm::Optional< LogMessage > DivisionByZeroChecker::display_division_check(
     Result result, ar::BinaryOperation* stmt) const {

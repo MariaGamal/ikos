@@ -48,6 +48,18 @@
 namespace ikos {
 namespace analyzer {
 
+enum OriginKind {
+  ConstantKind,
+  VariableKind,
+  ArrayKind
+};
+
+struct Origin {
+  OriginKind kind;
+  ar::Value* src;
+  ar::Value* index;
+};
+
 /// \brief Division by zero checker
 class DivisionByZeroChecker final : public Checker {
 private:
@@ -92,9 +104,8 @@ private:
                             const value::AbstractDomain& inv,
                             CallContext* call_context);
 
-  ar::Statement* getValueOrigin(ar::Value* stmt);
+  std::set<struct Origin> getValueOrigin(ar::Value* value, ar::Statement* stmt);
 
-  ar::Statement* getVariableOrigin(ar::Variable* stmt);
 
 private:
   /// \brief Dispay the check for the given division, if requested
