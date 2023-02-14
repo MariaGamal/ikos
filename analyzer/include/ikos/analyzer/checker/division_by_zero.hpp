@@ -58,7 +58,32 @@ struct Origin {
   OriginKind kind;
   ar::Value* src;
   ar::Value* index;
+  ar::Statement* stmt;
 };
+void printSet(std::set<struct Origin> s);
+
+enum OpKind {
+  Plus,
+  Minus
+};
+
+struct Constraint {
+  OpKind first_op; 
+  ar::Value* first_arg;
+  OpKind second_op; 
+  ar::Value* second_arg;
+  int num;
+};
+
+std::vector<struct Constraint> getConstraint(std::string cons, ar::Value* arg1, ar::Value* arg2, std::string val1, std::string val2);
+
+struct Constraint parseConstraint(std::string cons, ar::Value* arg1, ar::Value* arg2, std::string val1, std::string val2);
+
+bool leq(std::vector<struct Constraint> constraints, ar::Value* arg1, ar::Value* arg2);
+bool le(std::vector<struct Constraint> constraints, ar::Value* arg1, ar::Value* arg2);
+
+bool leq(std::string cons, ar::Value* arg1, ar::Value* arg2, std::string val1, std::string val2);
+bool le(std::string cons, ar::Value* arg1, ar::Value* arg2, std::string val1, std::string val2);
 
 /// \brief Division by zero checker
 class DivisionByZeroChecker final : public Checker {
@@ -97,12 +122,13 @@ private:
   bool isTarget(ar::Statement* stmt);
 
   std::pair< bool, int > isFirstPart(ar::Statement* stmt);
+  std::pair< bool, int > isSecondPart(ar::Statement* stmt);
 
   void handleFirstPartStmt(ar::Statement* stmt, int loop_index);
 
   void handleSecondPartStmt(ar::Statement* stmt,
                             const value::AbstractDomain& inv,
-                            CallContext* call_context);
+                            int loop_index);
 
   std::set<struct Origin> getValueOrigin(ar::Value* value, ar::Statement* stmt);
 
