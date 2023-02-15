@@ -60,7 +60,6 @@ struct Origin {
   ar::Value* index;
   ar::Statement* stmt;
 };
-void printSet(std::set<struct Origin> s);
 
 enum OpKind {
   Plus,
